@@ -88,32 +88,32 @@ eventFrame:SetScript("OnEvent", function(self, event, addonName)
             MageTeleportsDB = {}
         end
         
-        -- Statistik initialisieren
+        
         if not MageTeleportsDB.stats then
             MageTeleportsDB.stats = {}
         end
         
-        -- Counter-Einstellung initialisieren (Standard: aktiviert)
+        
         if MageTeleportsDB.showCounter == nil then
             MageTeleportsDB.showCounter = true
         end
         
-        -- Transparenz initialisieren (Standard: 0.95)
+        
         if MageTeleportsDB.transparency == nil then
             MageTeleportsDB.transparency = 0.95
         end
         
-        -- Nur gelernte anzeigen initialisieren (Standard: deaktiviert)
+        
         if MageTeleportsDB.showOnlyLearned == nil then
             MageTeleportsDB.showOnlyLearned = false
         end
         
-        -- Automatisch schließen initialisieren (Standard: deaktiviert)
+        
         if MageTeleportsDB.autoClose == nil then
             MageTeleportsDB.autoClose = false
         end
         
-        -- Minimap-Icon Position initialisieren (Standard: 0 = oben)
+        
         if MageTeleportsDB.minimapIconAngle == nil then
             MageTeleportsDB.minimapIconAngle = 0
         end
@@ -125,7 +125,7 @@ eventFrame:SetScript("OnEvent", function(self, event, addonName)
 end)
 
 function CreateMainFrame()
-    -- Alten Frame bereinigen falls vorhanden (verhindert doppelte Event-Handler)
+    
     if MageTeleportsFrame then
         MageTeleportsFrame:UnregisterAllEvents()
         MageTeleportsFrame:Hide()
@@ -213,7 +213,7 @@ function CreateMainFrame()
             end
         elseif event == "UNIT_SPELLCAST_START" then
             local unit, castGUID, spellID = ...
-            -- Nach Cast-Start schließen, nicht im PostClick (sonst wird der Cast abgebrochen)
+            
             if unit == "player" and statsTexts[spellID] and MageTeleportsDB.autoClose and not InCombatLockdown() then
                 MageTeleportsFrame:Hide()
             end
@@ -378,7 +378,7 @@ function CreateMainFrame()
         settingsFrame:Show()
     end)
     
-    -- Reset-Button für Counter
+    
     local resetBtn = CreateFrame("Button", nil, settingsFrame, "BackdropTemplate")
     resetBtn:SetPoint("LEFT", counterLabel, "RIGHT", 10, 0)
     resetBtn:SetSize(50, 20)
@@ -409,17 +409,17 @@ function CreateMainFrame()
     end)
     
     resetBtn:SetScript("OnClick", function(self)
-        -- Alle Counter auf 0 zurücksetzen
+        
         MageTeleportsDB.stats = {}
         
-        -- UI aktualisieren
+        
         MageTeleportsFrame:Hide()
         CreateMainFrame()
         MageTeleportsFrame:Show()
         settingsFrame:Show()
     end)
     
-    -- Checkbox für "Nur gelernte anzeigen"
+    
     local onlyLearnedCheckbox = CreateFrame("CheckButton", "MageTeleportsOnlyLearnedCheckbox", settingsFrame, "UICheckButtonTemplate")
     onlyLearnedCheckbox:SetPoint("TOPLEFT", 20, -75)
     onlyLearnedCheckbox:SetSize(24, 24)
@@ -438,7 +438,7 @@ function CreateMainFrame()
         settingsFrame:Show()
     end)
     
-    -- Checkbox für "Automatisch schließen"
+    
     local autoCloseCheckbox = CreateFrame("CheckButton", "MageTeleportsAutoCloseCheckbox", settingsFrame, "UICheckButtonTemplate")
     autoCloseCheckbox:SetPoint("TOPLEFT", 20, -100)
     autoCloseCheckbox:SetSize(24, 24)
@@ -461,19 +461,19 @@ function CreateMainFrame()
     transparencySlider:SetObeyStepOnDrag(true)
     transparencySlider:SetWidth(200)
     
-    -- Slider-Hintergrund (Track) hinzufügen
+    
     local sliderBg = transparencySlider:CreateTexture(nil, "BACKGROUND")
     sliderBg:SetPoint("TOPLEFT", 2, -8)
     sliderBg:SetPoint("BOTTOMRIGHT", -2, 8)
     sliderBg:SetColorTexture(0.3, 0.3, 0.3, 0.8)
     
-    -- Rahmen für den Slider
+    
     local sliderBorder = transparencySlider:CreateTexture(nil, "BORDER")
     sliderBorder:SetPoint("TOPLEFT", 1, -7)
     sliderBorder:SetPoint("BOTTOMRIGHT", -1, 7)
     sliderBorder:SetColorTexture(0.5, 0.5, 0.5, 1)
     
-    -- Innerer Hintergrund (dunkler)
+    
     local sliderInner = transparencySlider:CreateTexture(nil, "ARTWORK")
     sliderInner:SetPoint("TOPLEFT", 3, -9)
     sliderInner:SetPoint("BOTTOMRIGHT", -3, 9)
@@ -580,9 +580,9 @@ function CreateMainFrame()
         end
         local canLearn = playerLevel >= spell.level
         
-        -- Wenn "Nur gelernte anzeigen" aktiv ist, überspringe nicht gelernte Spells
+        
         if MageTeleportsDB.showOnlyLearned and not isKnown then
-            -- Spell überspringen
+            
         else
             local btn = CreateFrame("Button", nil, MageTeleportsFrame, "BackdropTemplate,SecureActionButtonTemplate")
             btn:SetSize(210, 50)
@@ -693,9 +693,9 @@ function CreateMainFrame()
         end
         local canLearn = playerLevel >= spell.level
         
-        -- Wenn "Nur gelernte anzeigen" aktiv ist, überspringe nicht gelernte Spells
+        
         if MageTeleportsDB.showOnlyLearned and not isKnown then
-            -- Spell überspringen
+            
         else
             local btn = CreateFrame("Button", nil, MageTeleportsFrame, "BackdropTemplate,SecureActionButtonTemplate")
             btn:SetSize(210, 50)
@@ -784,7 +784,7 @@ function CreateMainFrame()
         end
     end
 
-    -- Minimap-Button nur erstellen, wenn er noch nicht existiert
+    
     if not MageTeleportsMinimapButton then
         local minimapButton = CreateFrame("Button", "MageTeleportsMinimapButton", Minimap)
         minimapButton:SetSize(32, 32)
@@ -832,7 +832,7 @@ function CreateMainFrame()
             minimapButton:SetPoint("CENTER", Minimap, "CENTER", x, y)
         end
 
-        -- Position aus Datenbank laden
+        
         minimapButton.angle = MageTeleportsDB.minimapIconAngle or 0
 
         minimapButton:EnableMouse(true)
@@ -845,7 +845,7 @@ function CreateMainFrame()
         minimapButton:SetScript("OnMouseUp", function(self, button)
             if button == "RightButton" then
                 self.isMoving = false
-                -- Position in Datenbank speichern
+                
                 MageTeleportsDB.minimapIconAngle = self.angle
             end
         end)
