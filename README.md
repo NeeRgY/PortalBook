@@ -1,6 +1,6 @@
 
 [![version](https://img.shields.io/github/v/release/NeeRgY/PortalBook)](https://github.com/NeeRgY/PortalBook/releases)
-[![last commit](https://img.shields.io/github/last-commit/NeeRgY/PortalBook)](https://github.com/NeeRgY/PortalBook/commits/master)
+[![last commit](https://img.shields.io/github/last-commit/NeeRgY/PortalBook)](https://github.com/NeeRgY/PortalBook)
 [![Curseforge](https://img.shields.io/curseforge/dt/1439483?label=CurseForge&color=F16436)](https://www.curseforge.com/wow/addons/portal-book)
 
 &nbsp;
