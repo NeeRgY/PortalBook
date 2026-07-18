@@ -5,6 +5,10 @@
 
 &nbsp;
 
+__PortalBook__ is a lightweight addon designed specifically for Mages, providing a clean, organized interface to access all Teleport and Portal spells in one convenient window.
+
+So far, it is only intended for TBC (anniversary) 2.5.5 - 2.5.6 and Classic 1.15.8.
+
 ## Features
 
 - __Dual-column layout:__ Left side shows Teleports, right side shows Portals – all faction-specific (Alliance/Horde)
