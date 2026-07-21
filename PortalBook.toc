@@ -1,8 +1,7 @@
-## Interface: 20506
-
-## Version: 1.0.7
+## Interface: 120007, 120100
+## Version: 2.0.0
 ## Title: Portal Book
-## Notes: Mage Interface for Portals / Teleports (1.0.7)
+## Notes: Mage portals & teleports for Retail (12.0.7 / 12.1.0)
 ## Author: NeRgY
 ## Category: Portals
 ## X-Category: Portals
@@ -10,4 +9,12 @@
 ## SavedVariables: MageTeleportsDB
 ## IconTexture: Interface\AddOns\PortalBook\icon
 
-PortalBook.lua
+Locales\enUS.lua
+Locales\deDE.lua
+Locales\frFR.lua
+Locales\esES.lua
+Locales\ruRU.lua
+Shared.lua
+Retail\Data.lua
+Retail\UI.lua
+Core.lua

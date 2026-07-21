@@ -1,0 +1,20 @@
+## Interface: 20506
+## Version: 2.0.0
+## Title: Portal Book
+## Notes: Mage portals & teleports for Burning Crusade Classic
+## Author: NeRgY
+## Category: Portals
+## X-Category: Portals
+## DefaultState: enabled
+## SavedVariables: MageTeleportsDB
+## IconTexture: Interface\AddOns\PortalBook\icon
+
+Locales\enUS.lua
+Locales\deDE.lua
+Locales\frFR.lua
+Locales\esES.lua
+Locales\ruRU.lua
+Shared.lua
+Classic\Data_TBC.lua
+Classic\UI.lua
+Core.lua
