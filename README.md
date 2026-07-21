@@ -5,36 +5,57 @@
 
 &nbsp;
 
-__PortalBook__ is a lightweight addon designed specifically for Mages, providing a clean, organized interface to access all Teleport and Portal spells in one convenient window.
+__PortalBook__ is a lightweight addon for Mages that provides a clean, modern interface to access all Teleport and Portal spells in one convenient window.
 
-So far, it is only intended for TBC (anniversary) 2.5.5 - 2.5.6.
+Supports __Retail__ (Midnight), __Burning Crusade Classic__, and __Classic Era__.
 
 ## Features
 
-- __Dual-column layout:__ Left side shows Teleports, right side shows Portals – all faction-specific (Alliance/Horde)
-- __Smart spell detection:__ The buttons become clean when spells are learned. If a spell is learnable but not yet learned, it is red with the message “not learned yet.” If - __the spell__ cannot yet be learned, a level requirement is displayed.
-- __Clickable spell buttons:__ Direct casting with a click in the interface.
-- __Minimap button:__ Dragable, with tooltip and toggle functionality (/portalb slash command)
-- __Movable UI:__ Lock/unlock button to reposition the window and save position
-- __Full localization:__ German (deDE) and English (enUS) support
-- __Counter:__ Counter that increments by +1 with each teleportation or portal
+- __Modern UI:__ Dark panel with teleports on the left, portals on the right, and destination names in the center – always faction-aware (Alliance/Horde)
+- __Smart spell detection:__ Learned spells are ready to cast. Unlearned spells show as desaturated/red with level requirement and where to learn them
+- __Clickable spell buttons:__ Cast teleports and portals directly from the interface
+- __Minimap button:__ Draggable, with tooltip and toggle (`/portalb`)
+- __Movable window:__ Always movable; position is saved automatically
+- __Class check:__ Non-mages see a red “Not a Mage” warning in the title bar
+- __Full localization:__ English (enUS), German (deDE), French (frFR), Spanish (esES/esMX), Russian (ruRU)
+- __Counter:__ Increments by +1 for each teleport or portal cast
 - __Settings:__
-- Display counter with reset button (Enabled by default) 
-- Only displays learned skills (Disabled by default)
-- Interface closes automatically when casting (Disabled by default)
-- Slider to adjust transparency of main window
+  - Show counter with reset button (enabled by default)
+  - Show only learned spells (disabled by default)
+  - Auto-close interface on cast (disabled by default)
+  - Announce portal in party/raid (disabled by default)
+  - Transparency slider for the main window
+
+### Retail
+- Expansion filter tabs (including “All”)
+- Search bar and scrollable destination list
+- Destinations from capitals through current expansions
+
+### Classic / TBC
+- Same look as Retail, without tabs, search, or scrollbar
+- Flat destination list with compact window height
+- Rune of Teleportation / Rune of Portals counts in the footer
+- Learn tooltips with the correct portal trainer per city
 
 &nbsp;
 
 ## Supported Spells
-__Alliance:__ Stormwind, Ironforge, Darnassus, Exodar, Theramore, Shattrath
 
+### Retail
+Capitals and hubs across expansions (Alliance/Horde/neutral as appropriate), including Outland, Northrend, Cataclysm, Pandaria, Warlords, Legion, Battle for Azeroth, Shadowlands, Dragonflight, The War Within, and Midnight.
+
+### Burning Crusade Classic
+__Alliance:__ Stormwind, Ironforge, Darnassus, Exodar, Theramore, Shattrath  
 __Horde:__ Orgrimmar, Undercity, Thunder Bluff, Silvermoon, Stonard, Shattrath
+
+### Classic Era
+__Alliance:__ Stormwind, Ironforge, Darnassus  
+__Horde:__ Orgrimmar, Undercity, Thunder Bluff
 
 &nbsp;
 
 ## Usage
 
-- Type /portalb or click minimap button to toggle
-- Drag window when unlocked, click lock button to save position
-- To make it even easier, you can create a macro that simply executes “/portalb” This allows you to call up the GUI via a button in the action bar.
+- Type `/portalb` or click the minimap button to toggle the window
+- Drag the window to reposition it (position is saved automatically)
+- Optional: create a macro with `/portalb` to open the UI from an action bar button
