@@ -152,10 +152,12 @@ local function WireSpellButton(btn, spellID, hoverColor, kindLabel, requiredLeve
     end)
 end
 
-local function CreateDestinationRow(parent, dest, index)
+-- Builds the reusable skeleton of a destination row. Per-destination content is
+-- filled in by UpdateDestinationRow so rows can be pooled instead of recreated
+-- (WoW never frees frames, so recreating them on every refresh leaks).
+local function CreateDestinationRow(parent)
     local row = CreateFrame("Frame", nil, parent, "BackdropTemplate")
     row:SetSize(FRAME_WIDTH - 58, ROW_HEIGHT)
-    row:SetPoint("TOPLEFT", 8, -((index - 1) * (ROW_HEIGHT + ROW_GAP)))
     row:SetBackdrop({
         bgFile = "Interface\\Buttons\\WHITE8X8",
         edgeFile = "Interface\\Buttons\\WHITE8X8",
@@ -163,107 +165,121 @@ local function CreateDestinationRow(parent, dest, index)
         edgeSize = 1,
         insets = { left = 0, right = 0, top = 0, bottom = 0 },
     })
-    row:SetBackdropColor(C.row[1], C.row[2], C.row[3], 0.9)
     row:SetBackdropBorderColor(C.border[1], C.border[2], C.border[3], 0.5)
-
-    local teleKnown = ns.IsSpellKnown(dest.teleport)
-    local portalKnown = dest.portal and ns.IsSpellKnown(dest.portal)
 
     local teleBtn = CreateIconButton(row, ICON_SIZE)
     teleBtn:SetPoint("LEFT", 6, 0)
-    WireSpellButton(teleBtn, dest.teleport, C.accent, L["TELEPORT"], dest.teleportLevel, dest.source)
+    row.teleBtn = teleBtn
 
     local teleCounter = row:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     teleCounter:SetPoint("LEFT", teleBtn, "RIGHT", 6, 0)
     teleCounter:SetWidth(36)
     teleCounter:SetJustifyH("LEFT")
     SetFontColor(teleCounter, C.accent)
-    local teleCount = (MageTeleportsDB.stats and MageTeleportsDB.stats[dest.teleport]) or 0
-    if MageTeleportsDB.showCounter then
-        teleCounter:SetText(teleCount .. "x")
-    else
-        teleCounter:SetText("")
-    end
-
-    local portalBtn
-    local portalCounter
+    row.teleCounter = teleCounter
 
     local portalSlot = CreateFrame("Frame", nil, row)
     portalSlot:SetSize(ICON_SIZE, ICON_SIZE)
     portalSlot:SetPoint("RIGHT", -4, 0)
+    row.portalSlot = portalSlot
 
-    portalCounter = row:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    local portalCounter = row:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     portalCounter:SetPoint("RIGHT", portalSlot, "LEFT", -6, 0)
     portalCounter:SetWidth(36)
     portalCounter:SetJustifyH("RIGHT")
     SetFontColor(portalCounter, C.accentPortal)
+    row.portalCounter = portalCounter
 
-    if dest.portal then
-        portalBtn = CreateIconButton(row, ICON_SIZE)
-        portalBtn:SetPoint("CENTER", portalSlot, "CENTER")
-        WireSpellButton(portalBtn, dest.portal, C.accentPortal, L["PORTAL"], dest.portalLevel, dest.source)
+    local portalBtn = CreateIconButton(row, ICON_SIZE)
+    portalBtn:SetPoint("CENTER", portalSlot, "CENTER")
+    row.portalBtn = portalBtn
 
-        local portalCount = (MageTeleportsDB.stats and MageTeleportsDB.stats[dest.portal]) or 0
-        if MageTeleportsDB.showCounter then
-            portalCounter:SetText(portalCount .. "x")
-        else
-            portalCounter:SetText("")
-        end
-        row.portalBtn = portalBtn
-        ns.RegisterSpellButton(portalBtn, dest.portal, portalCounter, dest.key)
-    else
-        local placeholder = row:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-        placeholder:SetPoint("CENTER", portalSlot, "CENTER")
-        placeholder:SetText("—")
-        SetFontColor(placeholder, C.textMuted)
-        portalCounter:SetText("")
-    end
+    local portalPlaceholder = row:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    portalPlaceholder:SetPoint("CENTER", portalSlot, "CENTER")
+    portalPlaceholder:SetText("—")
+    SetFontColor(portalPlaceholder, C.textMuted)
+    row.portalPlaceholder = portalPlaceholder
 
     local nameText = row:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     nameText:SetJustifyH("CENTER")
     nameText:SetWordWrap(false)
-    nameText:SetText(L[dest.key] or dest.key)
     SetFontColor(nameText, C.text)
+    row.nameText = nameText
 
     local statusText = row:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     statusText:SetJustifyH("CENTER")
     statusText:SetWordWrap(false)
+    row.statusText = statusText
+
+    return row
+end
+
+local function UpdateDestinationRow(row, dest, index)
+    row:ClearAllPoints()
+    row:SetPoint("TOPLEFT", 8, -((index - 1) * (ROW_HEIGHT + ROW_GAP)))
+
+    local teleKnown = ns.IsSpellKnown(dest.teleport)
+    local portalKnown = dest.portal and ns.IsSpellKnown(dest.portal)
+
+    WireSpellButton(row.teleBtn, dest.teleport, C.accent, L["TELEPORT"], dest.teleportLevel, dest.source)
+    local teleCount = (MageTeleportsDB.stats and MageTeleportsDB.stats[dest.teleport]) or 0
+    row.teleCounter:SetText(MageTeleportsDB.showCounter and (teleCount .. "x") or "")
+
+    if dest.portal then
+        row.portalBtn:Show()
+        row.portalPlaceholder:Hide()
+        WireSpellButton(row.portalBtn, dest.portal, C.accentPortal, L["PORTAL"], dest.portalLevel, dest.source)
+        local portalCount = (MageTeleportsDB.stats and MageTeleportsDB.stats[dest.portal]) or 0
+        row.portalCounter:SetText(MageTeleportsDB.showCounter and (portalCount .. "x") or "")
+        ns.RegisterSpellButton(row.portalBtn, dest.portal, row.portalCounter, dest.key)
+    else
+        row.portalBtn:Hide()
+        row.portalBtn:SetAttribute("type", nil)
+        row.portalBtn:SetAttribute("spell", nil)
+        row.portalPlaceholder:Show()
+        row.portalCounter:SetText("")
+    end
+
+    row.nameText:SetText(L[dest.key] or dest.key)
+    row.nameText:ClearAllPoints()
+    row.statusText:ClearAllPoints()
 
     local knownAny = teleKnown or portalKnown
     local fullyKnown = teleKnown and (not dest.portal or portalKnown)
     if not fullyKnown then
-        nameText:SetPoint("LEFT", teleCounter, "RIGHT", 8, 7)
-        nameText:SetPoint("RIGHT", portalCounter, "LEFT", -8, 7)
-        statusText:SetPoint("LEFT", teleCounter, "RIGHT", 8, -8)
-        statusText:SetPoint("RIGHT", portalCounter, "LEFT", -8, -8)
+        row.nameText:SetPoint("LEFT", row.teleCounter, "RIGHT", 8, 7)
+        row.nameText:SetPoint("RIGHT", row.portalCounter, "LEFT", -8, 7)
+        row.statusText:SetPoint("LEFT", row.teleCounter, "RIGHT", 8, -8)
+        row.statusText:SetPoint("RIGHT", row.portalCounter, "LEFT", -8, -8)
 
         local teleNeed = (not teleKnown) and dest.teleportLevel or nil
         local portalNeed = (dest.portal and not portalKnown) and dest.portalLevel or nil
         if teleNeed and portalNeed and teleNeed ~= portalNeed then
-            statusText:SetText(string.format(L["LEVEL_SPLIT"], teleNeed, portalNeed))
+            row.statusText:SetText(string.format(L["LEVEL_SPLIT"], teleNeed, portalNeed))
         else
             local level = teleNeed or portalNeed
             if level then
-                statusText:SetText(string.format(L["LEVEL_SHORT"], level))
+                row.statusText:SetText(string.format(L["LEVEL_SHORT"], level))
             else
-                statusText:SetText(L["NOT_LEARNED"])
+                row.statusText:SetText(L["NOT_LEARNED"])
             end
         end
-        SetFontColor(statusText, { 1, 0.7, 0.35 })
+        SetFontColor(row.statusText, { 1, 0.7, 0.35 })
     else
-        nameText:SetPoint("LEFT", teleCounter, "RIGHT", 8, 0)
-        nameText:SetPoint("RIGHT", portalCounter, "LEFT", -8, 0)
-        statusText:SetText("")
+        row.nameText:SetPoint("LEFT", row.teleCounter, "RIGHT", 8, 0)
+        row.nameText:SetPoint("RIGHT", row.portalCounter, "LEFT", -8, 0)
+        row.statusText:SetText("")
     end
 
-    ns.RegisterSpellButton(teleBtn, dest.teleport, teleCounter, dest.key)
+    ns.RegisterSpellButton(row.teleBtn, dest.teleport, row.teleCounter, dest.key)
 
     if not knownAny then
         row:SetBackdropColor(0.08, 0.07, 0.08, 0.75)
-        nameText:SetAlpha(0.85)
+        row.nameText:SetAlpha(0.85)
+    else
+        row:SetBackdropColor(C.row[1], C.row[2], C.row[3], 0.9)
+        row.nameText:SetAlpha(1)
     end
-
-    return row
 end
 
 function ns.RegisterSpellButton(btn, spellID, counterText, destKey)
@@ -284,8 +300,11 @@ function ns.AnnounceDestination(destKey)
     if not IsInGroup() then
         return
     end
-    local destination = L[destKey] or destKey
-    local message = string.format(L["ANNOUNCE_MSG"], destination)
+    -- Always announce in English so party/raid members read the same message
+    -- regardless of the caster's client locale.
+    local EN = ns.enL or L
+    local destination = EN[destKey] or L[destKey] or destKey
+    local message = string.format(EN["ANNOUNCE_MSG"] or "Open a Portal to %s", destination)
     if IsInRaid() then
         SendChatMessage(message, "RAID")
     else
@@ -333,15 +352,12 @@ function ns.RefreshDestinationList()
     ns.spellButtons = {}
     frame.rows = frame.rows or {}
 
-    for _, row in ipairs(frame.rows) do
-        row:Hide()
-        row:SetParent(nil)
-    end
-    wipe(frame.rows)
-
     local faction = UnitFactionGroup("player")
     local expansion = frame.activeExpansion
     if not expansion then
+        for _, row in ipairs(frame.rows) do
+            row:Hide()
+        end
         frame.scrollChild:SetHeight(1)
         return
     end
@@ -354,7 +370,17 @@ function ns.RefreshDestinationList()
     )
 
     for i, dest in ipairs(destinations) do
-        frame.rows[i] = CreateDestinationRow(frame.scrollChild, dest, i)
+        local row = frame.rows[i]
+        if not row then
+            row = CreateDestinationRow(frame.scrollChild)
+            frame.rows[i] = row
+        end
+        UpdateDestinationRow(row, dest, i)
+        row:Show()
+    end
+
+    for i = #destinations + 1, #frame.rows do
+        frame.rows[i]:Hide()
     end
 
     local contentHeight = math.max(#destinations * (ROW_HEIGHT + ROW_GAP), 1)
@@ -479,121 +505,6 @@ function ns.RebuildTabs()
     end
 end
 
-local function CreateSettingsFrame()
-    local settings = CreateFrame("Frame", "MageTeleportsSettingsFrame", UIParent, "BackdropTemplate")
-    settings:SetSize(320, 250)
-    settings:SetPoint("CENTER")
-    settings:SetClampedToScreen(true)
-    settings:Hide()
-    settings:SetFrameStrata("DIALOG")
-    settings:SetMovable(true)
-    settings:EnableMouse(true)
-    settings:RegisterForDrag("LeftButton")
-    settings:SetScript("OnDragStart", settings.StartMoving)
-    settings:SetScript("OnDragStop", settings.StopMovingOrSizing)
-    ApplyBackdrop(settings, 0.95)
-    ns.settingsFrame = settings
-
-    local title = settings:CreateFontString(nil, "OVERLAY", "GameFontHighlightLarge")
-    title:SetPoint("TOP", 0, -12)
-    title:SetText(L["SETTINGS"])
-    SetFontColor(title, C.text)
-
-    local closeBtn = CreateTitlebarButton(settings, ICON_CLOSE, 10, true)
-    closeBtn:SetPoint("TOPRIGHT", -2, -2)
-    closeBtn:SetScript("OnClick", function()
-        settings:Hide()
-    end)
-    closeBtn:HookScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self, "ANCHOR_TOP")
-        GameTooltip:SetText(CLOSE or "Close", 1, 1, 1, 1, true)
-        GameTooltip:Show()
-    end)
-
-    local function AddCheckbox(y, labelText, dbKey, onChange)
-        local cb = CreateFrame("CheckButton", nil, settings, "UICheckButtonTemplate")
-        cb:SetPoint("TOPLEFT", 18, y)
-        cb:SetSize(24, 24)
-        cb:SetChecked(MageTeleportsDB[dbKey])
-
-        local label = settings:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        label:SetPoint("LEFT", cb, "RIGHT", 4, 0)
-        label:SetText(labelText)
-        SetFontColor(label, C.text)
-
-        cb:SetScript("OnClick", function(self)
-            MageTeleportsDB[dbKey] = self:GetChecked() and true or false
-            if onChange then
-                onChange(self)
-            end
-        end)
-        return cb, label
-    end
-
-    local _, counterLabel = AddCheckbox(-48, L["SHOW_COUNTER"], "showCounter", function()
-        ns.UpdateCounters()
-    end)
-
-    local resetBtn = CreateFrame("Button", nil, settings, "BackdropTemplate")
-    resetBtn:SetPoint("LEFT", counterLabel, "RIGHT", 10, 0)
-    resetBtn:SetSize(54, 20)
-    resetBtn:SetBackdrop({
-        bgFile = "Interface\\Buttons\\WHITE8X8",
-        edgeFile = "Interface\\Buttons\\WHITE8X8",
-        tile = false,
-        edgeSize = 1,
-        insets = { left = 0, right = 0, top = 0, bottom = 0 },
-    })
-    resetBtn:SetBackdropColor(C.dangerMuted[1], C.dangerMuted[2], C.dangerMuted[3], 0.9)
-    resetBtn:SetBackdropBorderColor(0.6, 0.3, 0.3, 1)
-
-    local resetText = resetBtn:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    resetText:SetPoint("CENTER")
-    resetText:SetText(L["RESET_COUNTER"])
-
-    resetBtn:SetScript("OnEnter", function(self)
-        self:SetBackdropColor(0.55, 0.25, 0.25, 1)
-        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-        GameTooltip:SetText(L["RESET_COUNTER_TOOLTIP"], 1, 1, 1)
-        GameTooltip:Show()
-    end)
-    resetBtn:SetScript("OnLeave", function(self)
-        self:SetBackdropColor(C.dangerMuted[1], C.dangerMuted[2], C.dangerMuted[3], 0.9)
-        GameTooltip:Hide()
-    end)
-    resetBtn:SetScript("OnClick", function()
-        MageTeleportsDB.stats = {}
-        ns.UpdateCounters()
-    end)
-
-    AddCheckbox(-76, L["SHOW_ONLY_LEARNED"], "showOnlyLearned", function()
-        ns.RebuildTabs()
-    end)
-
-    AddCheckbox(-104, L["AUTO_CLOSE"], "autoClose")
-
-    AddCheckbox(-132, L["ANNOUNCE_PORTAL"], "announcePortal")
-
-    local slider = CreateFrame("Slider", "MageTeleportsTransparencySlider", settings, "OptionsSliderTemplate")
-    slider:SetPoint("TOPLEFT", 20, -185)
-    slider:SetMinMaxValues(0.3, 1.0)
-    slider:SetValue(MageTeleportsDB.transparency or 0.95)
-    slider:SetValueStep(0.05)
-    slider:SetObeyStepOnDrag(true)
-    slider:SetWidth(240)
-
-    _G[slider:GetName() .. "Low"]:SetText("30%")
-    _G[slider:GetName() .. "High"]:SetText("100%")
-    _G[slider:GetName() .. "Text"]:SetText(L["TRANSPARENCY"])
-
-    slider:SetScript("OnValueChanged", function(_, value)
-        MageTeleportsDB.transparency = value
-        if ns.mainFrame then
-            ns.mainFrame:SetBackdropColor(C.bg[1], C.bg[2], C.bg[3], value)
-        end
-    end)
-end
-
 function ns.CreateMainFrame()
     if ns.mainFrame then
         ns.mainFrame:UnregisterAllEvents()
@@ -609,6 +520,11 @@ function ns.CreateMainFrame()
     ApplyBackdrop(frame)
     ns.mainFrame = frame
     MageTeleportsFrame = frame
+    frame:SetScale((MageTeleportsDB and MageTeleportsDB.scale) or 1.0)
+
+    if not tContains(UISpecialFrames, "MageTeleportsFrame") then
+        tinsert(UISpecialFrames, "MageTeleportsFrame")
+    end
 
     if MageTeleportsDB.point then
         frame:ClearAllPoints()
@@ -657,14 +573,7 @@ function ns.CreateMainFrame()
     local settingsBtn = CreateTitlebarButton(frame, ICON_SETTINGS, 12, false)
     settingsBtn:SetPoint("RIGHT", closeBtn, "LEFT", 0, 0)
     settingsBtn:SetScript("OnClick", function()
-        if not ns.settingsFrame then
-            CreateSettingsFrame()
-        end
-        if ns.settingsFrame:IsShown() then
-            ns.settingsFrame:Hide()
-        else
-            ns.settingsFrame:Show()
-        end
+        ns.ToggleSettingsFrame()
     end)
     settingsBtn:HookScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_TOP")
@@ -718,7 +627,47 @@ function ns.CreateMainFrame()
     clearSearchBtn:SetPoint("RIGHT", -2, 0)
     clearSearchBtn:SetSize(20, 20)
     clearSearchBtn:Hide()
+    local searchTimer
+
+    local function CancelSearchTimer()
+        if searchTimer then
+            searchTimer:Cancel()
+            searchTimer = nil
+        end
+    end
+
+    local function RunSearch()
+        searchTimer = nil
+        local text = strtrim(searchBox:GetText() or "")
+        frame.searchText = text
+        if text ~= "" and frame.activeExpansion ~= "ALL" and frame.tabs.ALL then
+            SelectTab(frame, "ALL")
+        else
+            ns.RefreshDestinationList()
+        end
+    end
+
+    -- Placeholder / clear button update instantly; the (expensive) list rebuild
+    -- is debounced so it does not run on every keystroke.
+    local function ApplySearchText(immediate)
+        local text = strtrim(searchBox:GetText() or "")
+        if text == "" then
+            searchPlaceholder:Show()
+            clearSearchBtn:Hide()
+        else
+            searchPlaceholder:Hide()
+            clearSearchBtn:Show()
+        end
+        CancelSearchTimer()
+        if immediate then
+            RunSearch()
+        else
+            searchTimer = C_Timer.NewTimer(0.2, RunSearch)
+        end
+    end
+
     clearSearchBtn:SetScript("OnClick", function()
+        CancelSearchTimer()
         searchBox:SetText("")
         searchBox:ClearFocus()
         frame.searchText = ""
@@ -727,38 +676,19 @@ function ns.CreateMainFrame()
         ns.RefreshDestinationList()
     end)
 
-    local function ApplySearchText()
-        local text = searchBox:GetText() or ""
-        text = strtrim(text)
-        frame.searchText = text
-        if text == "" then
-            searchPlaceholder:Show()
-            clearSearchBtn:Hide()
-            ns.RefreshDestinationList()
-        else
-            searchPlaceholder:Hide()
-            clearSearchBtn:Show()
-            if frame.activeExpansion ~= "ALL" and frame.tabs.ALL then
-                SelectTab(frame, "ALL")
-            else
-                ns.RefreshDestinationList()
-            end
-        end
-    end
-
     searchBox:SetScript("OnTextChanged", function(self, userInput)
         if userInput then
-            ApplySearchText()
+            ApplySearchText(false)
         end
     end)
     searchBox:SetScript("OnEnterPressed", function(self)
         self:ClearFocus()
-        ApplySearchText()
+        ApplySearchText(true)
     end)
     searchBox:SetScript("OnEscapePressed", function(self)
         self:SetText("")
         self:ClearFocus()
-        ApplySearchText()
+        ApplySearchText(true)
     end)
     searchBox:SetScript("OnEditFocusGained", function()
         searchPlaceholder:Hide()
@@ -804,34 +734,36 @@ function ns.CreateMainFrame()
 
     frame:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
     frame:RegisterEvent("UNIT_SPELLCAST_START")
+    frame:RegisterEvent("SPELLS_CHANGED")
     frame:SetScript("OnEvent", function(_, event, unit, _, spellID)
+        if event == "SPELLS_CHANGED" then
+            ns.ScheduleSpellRefresh()
+            return
+        end
         if unit ~= "player" then
             return
         end
+        local entry = ns.BuildSpellIndex()[spellID]
+        if not entry then
+            return
+        end
         if event == "UNIT_SPELLCAST_SUCCEEDED" then
-            if ns.spellButtons and ns.spellButtons[spellID] then
-                MageTeleportsDB.stats = MageTeleportsDB.stats or {}
-                MageTeleportsDB.stats[spellID] = (MageTeleportsDB.stats[spellID] or 0) + 1
-                if MageTeleportsDB.showCounter then
-                    ns.UpdateCounters()
-                end
+            MageTeleportsDB.stats = MageTeleportsDB.stats or {}
+            MageTeleportsDB.stats[spellID] = (MageTeleportsDB.stats[spellID] or 0) + 1
+            if MageTeleportsDB.showCounter then
+                ns.UpdateCounters()
             end
         elseif event == "UNIT_SPELLCAST_START" then
-            local info = ns.spellButtons and ns.spellButtons[spellID]
-            if info then
-                if MageTeleportsDB.announcePortal then
-                    ns.AnnounceDestination(info.destKey)
-                end
-                if MageTeleportsDB.autoClose and not InCombatLockdown() then
-                    frame:Hide()
-                end
+            if MageTeleportsDB.announcePortal and entry.isPortal then
+                ns.AnnounceDestination(entry.destKey)
+            end
+            if MageTeleportsDB.autoClose and not InCombatLockdown() then
+                frame:Hide()
             end
         end
     end)
 
-    if not ns.settingsFrame then
-        CreateSettingsFrame()
-    end
+    ns.CreateSettingsFrame()
 
     frame.activeExpansion = "ALL"
     ns.RebuildTabs()

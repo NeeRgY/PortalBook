@@ -1,7 +1,19 @@
-## Interface: 11508
-## Version: 2.0.0
+## Interface: 11509
+## Version: 2.1.0
 ## Title: Portal Book
+## Title-deDE: Portal Book
+## Title-frFR: Portal Book
+## Title-esES: Portal Book
+## Title-esMX: Portal Book
+## Title-itIT: Portal Book
+## Title-ruRU: Portal Book
 ## Notes: Mage portals & teleports for Classic Era
+## Notes-deDE: Magierportale & Teleports für Classic Era
+## Notes-frFR: Portails et téléportations de mage pour Classic Era
+## Notes-esES: Portales y teletransportes de mago para Classic Era
+## Notes-esMX: Portales y teletransportes de mago para Classic Era
+## Notes-itIT: Portali e teletrasporti del mago per Classic Era
+## Notes-ruRU: Порталы и телепорты мага для Classic Era
 ## Author: NeRgY
 ## Category: Portals
 ## X-Category: Portals
@@ -13,8 +25,11 @@ Locales\enUS.lua
 Locales\deDE.lua
 Locales\frFR.lua
 Locales\esES.lua
+Locales\esMX.lua
+Locales\itIT.lua
 Locales\ruRU.lua
 Shared.lua
 Classic\Data_Vanilla.lua
 Classic\UI.lua
+Settings.lua
 Core.lua

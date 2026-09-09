@@ -99,10 +99,20 @@ function ns.GetVisibleDestinations(faction, expansion, showOnlyLearned, searchTe
 end
 
 function ns.GetAvailableExpansions(faction, showOnlyLearned)
+    local seen = {}
+    for _, dest in ipairs(ns.DESTINATIONS) do
+        if not seen[dest.expansion] and (dest.faction == "Neutral" or dest.faction == faction) then
+            local knownTeleport = ns.IsSpellKnown(dest.teleport)
+            local knownPortal = dest.portal and ns.IsSpellKnown(dest.portal)
+            if not showOnlyLearned or knownTeleport or knownPortal then
+                seen[dest.expansion] = true
+            end
+        end
+    end
+
     local available = { "ALL" }
     for _, expansion in ipairs(ns.EXPANSIONS) do
-        local destinations = ns.GetVisibleDestinations(faction, expansion, showOnlyLearned)
-        if #destinations > 0 then
+        if seen[expansion] then
             available[#available + 1] = expansion
         end
     end

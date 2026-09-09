@@ -1,7 +1,19 @@
 ## Interface: 20506
-## Version: 2.0.0
+## Version: 2.1.0
 ## Title: Portal Book
+## Title-deDE: Portal Book
+## Title-frFR: Portal Book
+## Title-esES: Portal Book
+## Title-esMX: Portal Book
+## Title-itIT: Portal Book
+## Title-ruRU: Portal Book
 ## Notes: Mage portals & teleports for Burning Crusade Classic
+## Notes-deDE: Magierportale & Teleports für Burning Crusade Classic
+## Notes-frFR: Portails et téléportations de mage pour Burning Crusade Classic
+## Notes-esES: Portales y teletransportes de mago para Burning Crusade Classic
+## Notes-esMX: Portales y teletransportes de mago para Burning Crusade Classic
+## Notes-itIT: Portali e teletrasporti del mago per Burning Crusade Classic
+## Notes-ruRU: Порталы и телепорты мага для Burning Crusade Classic
 ## Author: NeRgY
 ## Category: Portals
 ## X-Category: Portals
@@ -13,8 +25,11 @@ Locales\enUS.lua
 Locales\deDE.lua
 Locales\frFR.lua
 Locales\esES.lua
+Locales\esMX.lua
+Locales\itIT.lua
 Locales\ruRU.lua
 Shared.lua
 Classic\Data_TBC.lua
 Classic\UI.lua
+Settings.lua
 Core.lua

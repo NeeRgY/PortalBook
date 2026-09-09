@@ -1,7 +1,19 @@
-## Interface: 120007, 120100
-## Version: 2.0.0
+## Interface: 120007, 120100, 120105
+## Version: 2.1.0
 ## Title: Portal Book
-## Notes: Mage portals & teleports for Retail (12.0.7 / 12.1.0)
+## Title-deDE: Portal Book
+## Title-frFR: Portal Book
+## Title-esES: Portal Book
+## Title-esMX: Portal Book
+## Title-itIT: Portal Book
+## Title-ruRU: Portal Book
+## Notes: Mage portals & teleports for Retail (12.0.7 / 12.1.0 / 12.1.5)
+## Notes-deDE: Magierportale & Teleports für Retail (12.0.7 / 12.1.0 / 12.1.5)
+## Notes-frFR: Portails et téléportations de mage pour Retail (12.0.7 / 12.1.0 / 12.1.5)
+## Notes-esES: Portales y teletransportes de mago para Retail (12.0.7 / 12.1.0 / 12.1.5)
+## Notes-esMX: Portales y teletransportes de mago para Retail (12.0.7 / 12.1.0 / 12.1.5)
+## Notes-itIT: Portali e teletrasporti del mago per Retail (12.0.7 / 12.1.0 / 12.1.5)
+## Notes-ruRU: Порталы и телепорты мага для Retail (12.0.7 / 12.1.0 / 12.1.5)
 ## Author: NeRgY
 ## Category: Portals
 ## X-Category: Portals
@@ -13,8 +25,11 @@ Locales\enUS.lua
 Locales\deDE.lua
 Locales\frFR.lua
 Locales\esES.lua
+Locales\esMX.lua
+Locales\itIT.lua
 Locales\ruRU.lua
 Shared.lua
 Retail\Data.lua
 Retail\UI.lua
+Settings.lua
 Core.lua

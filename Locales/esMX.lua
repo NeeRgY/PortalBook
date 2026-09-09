@@ -2,10 +2,10 @@ local _, ns = ...
 ns.locales = ns.locales or {}
 
 local L = {}
-ns.locales.esES = L
+ns.locales.esMX = L
 
 L["TITLE"] = "Portal Book"
-L["NOT_A_MAGE"] = "No es mago"
+L["NOT_A_MAGE"] = "No eres mago"
 L["TELEPORT"] = "Teletransporte"
 L["PORTAL"] = "Portal"
 L["TELEPORTS"] = "Teletransportes"
@@ -37,7 +37,7 @@ L["SRC_HALL_QUEST"] = "Campaña de Legion (Sala del Guardián)"
 L["SRC_ANCIENT_TOME"] = "Tomo antiguo de teletransporte/portal: Dalaran"
 L["SETTINGS"] = "Opciones"
 L["SHOW_COUNTER"] = "Mostrar contador"
-L["RESET_COUNTER"] = "Reset"
+L["RESET_COUNTER"] = "Restablecer"
 L["RESET_COUNTER_TOOLTIP"] = "Restablecer todos los contadores"
 L["TRANSPARENCY"] = "Transparencia"
 L["SHOW_ONLY_LEARNED"] = "Mostrar solo aprendidos"

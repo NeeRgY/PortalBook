@@ -195,8 +195,11 @@ function ns.AnnounceDestination(destKey)
     if not IsInGroup() then
         return
     end
-    local destination = L[destKey] or destKey
-    local message = string.format(L["ANNOUNCE_MSG"], destination)
+    -- Always announce in English so party/raid members read the same message
+    -- regardless of the caster's client locale.
+    local EN = ns.enL or L
+    local destination = EN[destKey] or L[destKey] or destKey
+    local message = string.format(EN["ANNOUNCE_MSG"] or "Open a Portal to %s", destination)
     if IsInRaid() then
         SendChatMessage(message, "RAID")
     else
@@ -353,100 +356,6 @@ function ns.RefreshDestinationList()
     frame:SetHeight(LIST_TOP + LIST_FOOTER_GAP + listHeight + FOOTER_HEIGHT)
 end
 
-local function CreateSettingsFrame()
-    local settings = CreateFrame("Frame", "MageTeleportsSettingsFrame", UIParent, "BackdropTemplate")
-    settings:SetSize(320, 250)
-    settings:SetPoint("CENTER")
-    settings:SetClampedToScreen(true)
-    settings:Hide()
-    settings:SetFrameStrata("DIALOG")
-    settings:SetMovable(true)
-    settings:EnableMouse(true)
-    settings:RegisterForDrag("LeftButton")
-    settings:SetScript("OnDragStart", settings.StartMoving)
-    settings:SetScript("OnDragStop", settings.StopMovingOrSizing)
-    ApplyBackdrop(settings, 0.95)
-    ns.settingsFrame = settings
-
-    local title = settings:CreateFontString(nil, "OVERLAY", "GameFontHighlightLarge")
-    title:SetPoint("TOP", 0, -12)
-    title:SetText(L["SETTINGS"])
-    SetFontColor(title, C.text)
-
-    local closeBtn = CreateTitlebarButton(settings, ICON_CLOSE, 10, true)
-    closeBtn:SetPoint("TOPRIGHT", -2, -2)
-    closeBtn:SetScript("OnClick", function()
-        settings:Hide()
-    end)
-
-    local function AddCheckbox(y, labelText, dbKey, onChange)
-        local cb = CreateFrame("CheckButton", nil, settings, "UICheckButtonTemplate")
-        cb:SetPoint("TOPLEFT", 18, y)
-        cb:SetSize(24, 24)
-        cb:SetChecked(MageTeleportsDB[dbKey])
-
-        local label = settings:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        label:SetPoint("LEFT", cb, "RIGHT", 4, 0)
-        label:SetText(labelText)
-        SetFontColor(label, C.text)
-
-        cb:SetScript("OnClick", function(self)
-            MageTeleportsDB[dbKey] = self:GetChecked() and true or false
-            if onChange then
-                onChange(self)
-            end
-        end)
-        return cb, label
-    end
-
-    local _, counterLabel = AddCheckbox(-48, L["SHOW_COUNTER"], "showCounter", function()
-        ns.UpdateCounters()
-    end)
-
-    local resetBtn = CreateFrame("Button", nil, settings, "BackdropTemplate")
-    resetBtn:SetPoint("LEFT", counterLabel, "RIGHT", 10, 0)
-    resetBtn:SetSize(54, 20)
-    resetBtn:SetBackdrop({
-        bgFile = "Interface\\Buttons\\WHITE8X8",
-        edgeFile = "Interface\\Buttons\\WHITE8X8",
-        tile = false,
-        edgeSize = 1,
-        insets = { left = 0, right = 0, top = 0, bottom = 0 },
-    })
-    resetBtn:SetBackdropColor(C.dangerMuted[1], C.dangerMuted[2], C.dangerMuted[3], 0.9)
-    resetBtn:SetBackdropBorderColor(0.6, 0.3, 0.3, 1)
-    local resetText = resetBtn:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    resetText:SetPoint("CENTER")
-    resetText:SetText(L["RESET_COUNTER"])
-    resetBtn:SetScript("OnClick", function()
-        MageTeleportsDB.stats = {}
-        ns.UpdateCounters()
-    end)
-
-    AddCheckbox(-76, L["SHOW_ONLY_LEARNED"], "showOnlyLearned", function()
-        ns.RefreshDestinationList()
-    end)
-    AddCheckbox(-104, L["AUTO_CLOSE"], "autoClose")
-    AddCheckbox(-132, L["ANNOUNCE_PORTAL"], "announcePortal")
-
-    local slider = CreateFrame("Slider", "MageTeleportsTransparencySlider", settings, "OptionsSliderTemplate")
-    slider:SetPoint("TOPLEFT", 20, -185)
-    slider:SetMinMaxValues(0.3, 1.0)
-    slider:SetValue(MageTeleportsDB.transparency or 0.95)
-    slider:SetValueStep(0.05)
-    slider:SetObeyStepOnDrag(true)
-    slider:SetWidth(240)
-    _G[slider:GetName() .. "Low"]:SetText("30%")
-    _G[slider:GetName() .. "High"]:SetText("100%")
-    _G[slider:GetName() .. "Text"]:SetText(L["TRANSPARENCY"])
-    slider:SetScript("OnValueChanged", function(_, value)
-        MageTeleportsDB.transparency = value
-        if ns.mainFrame then
-            ns.mainFrame:SetBackdropColor(C.bg[1], C.bg[2], C.bg[3], value)
-        end
-    end)
-end
-
 function ns.CreateMainFrame()
     if ns.mainFrame then
         ns.mainFrame:UnregisterAllEvents()
@@ -462,6 +371,11 @@ function ns.CreateMainFrame()
     ApplyBackdrop(frame)
     ns.mainFrame = frame
     MageTeleportsFrame = frame
+    frame:SetScale((MageTeleportsDB and MageTeleportsDB.scale) or 1.0)
+
+    if not tContains(UISpecialFrames, "MageTeleportsFrame") then
+        tinsert(UISpecialFrames, "MageTeleportsFrame")
+    end
 
     if MageTeleportsDB.point then
         frame:ClearAllPoints()
@@ -505,14 +419,7 @@ function ns.CreateMainFrame()
     local settingsBtn = CreateTitlebarButton(frame, ICON_SETTINGS, 12, false)
     settingsBtn:SetPoint("RIGHT", closeBtn, "LEFT", 0, 0)
     settingsBtn:SetScript("OnClick", function()
-        if not ns.settingsFrame then
-            CreateSettingsFrame()
-        end
-        if ns.settingsFrame:IsShown() then
-            ns.settingsFrame:Hide()
-        else
-            ns.settingsFrame:Show()
-        end
+        ns.ToggleSettingsFrame()
     end)
     settingsBtn:HookScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_TOP")
@@ -589,38 +496,40 @@ function ns.CreateMainFrame()
     frame:RegisterEvent("BAG_UPDATE")
     frame:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
     frame:RegisterEvent("UNIT_SPELLCAST_START")
+    frame:RegisterEvent("SPELLS_CHANGED")
     frame:SetScript("OnEvent", function(_, event, unit, _, spellID)
         if event == "BAG_UPDATE" then
             UpdateRuneCount()
             return
         end
+        if event == "SPELLS_CHANGED" then
+            ns.ScheduleSpellRefresh()
+            return
+        end
         if unit ~= "player" then
             return
         end
+        local entry = ns.BuildSpellIndex()[spellID]
+        if not entry then
+            return
+        end
         if event == "UNIT_SPELLCAST_SUCCEEDED" then
-            if ns.spellButtons and ns.spellButtons[spellID] then
-                MageTeleportsDB.stats = MageTeleportsDB.stats or {}
-                MageTeleportsDB.stats[spellID] = (MageTeleportsDB.stats[spellID] or 0) + 1
-                if MageTeleportsDB.showCounter then
-                    ns.UpdateCounters()
-                end
+            MageTeleportsDB.stats = MageTeleportsDB.stats or {}
+            MageTeleportsDB.stats[spellID] = (MageTeleportsDB.stats[spellID] or 0) + 1
+            if MageTeleportsDB.showCounter then
+                ns.UpdateCounters()
             end
         elseif event == "UNIT_SPELLCAST_START" then
-            local info = ns.spellButtons and ns.spellButtons[spellID]
-            if info then
-                if MageTeleportsDB.announcePortal then
-                    ns.AnnounceDestination(info.destKey)
-                end
-                if MageTeleportsDB.autoClose and not (InCombatLockdown and InCombatLockdown()) then
-                    frame:Hide()
-                end
+            if MageTeleportsDB.announcePortal and entry.isPortal then
+                ns.AnnounceDestination(entry.destKey)
+            end
+            if MageTeleportsDB.autoClose and not (InCombatLockdown and InCombatLockdown()) then
+                frame:Hide()
             end
         end
     end)
 
-    if not ns.settingsFrame then
-        CreateSettingsFrame()
-    end
+    ns.CreateSettingsFrame()
 
     ns.RefreshDestinationList()
 end
