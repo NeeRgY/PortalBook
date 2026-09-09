@@ -13,8 +13,7 @@
 
 </div>
 
-&nbsp;
-
+---
 __PortalBook__ is a lightweight addon for Mages that provides a clean, modern interface to access all Teleport and Portal spells in one convenient window.
 
 Supports __Retail__ (Midnight), __Burning Crusade Classic__, and __Classic Era__.
@@ -22,19 +21,36 @@ Supports __Retail__ (Midnight), __Burning Crusade Classic__, and __Classic Era__
 ## Features
 
 - __Modern UI:__ Dark panel with teleports on the left, portals on the right, and destination names in the center – always faction-aware (Alliance/Horde)
-- __Smart spell detection:__ Learned spells are ready to cast. Unlearned spells show as desaturated/red with level requirement and where to learn them
+- __Smart spell detection:__ Learned spells are ready to cast. Unlearned spells show as desaturated/red with level requirement and where to learn them. Newly learned spells appear instantly, without reopening the window
 - __Clickable spell buttons:__ Cast teleports and portals directly from the interface
-- __Minimap button:__ Draggable, with tooltip and toggle (`/portalb`)
-- __Movable window:__ Always movable; position is saved automatically
+- __Minimap button:__ Left-click to open/close, right-click + drag to move it around the ring; can be hidden in the settings
+- __Movable & resizable window:__ Drag to reposition, position, size and all settings are saved automatically. Press `Esc` to close
 - __Class check:__ Non-mages see a red “Not a Mage” warning in the title bar
-- __Full localization:__ English (enUS), German (deDE), French (frFR), Spanish (esES/esMX), Russian (ruRU)
-- __Counter:__ Increments by +1 for each teleport or portal cast
-- __Settings:__
-  - Show counter with reset button (enabled by default)
-  - Show only learned spells (disabled by default)
-  - Auto-close interface on cast (disabled by default)
-  - Announce portal in party/raid (disabled by default)
-  - Transparency slider for the main window
+- __Cast counter:__ Counts every teleport and portal you cast – including casts straight from the spellbook, regardless of the active tab
+- __Party/raid announce:__ Optional “Open a Portal to X” message when you open a portal (portals only, never plain teleports), always posted in English so the whole group reads the same message
+- __Full localization:__ English (enUS), German (deDE), French (frFR), Spanish (esES / esMX), Italian (itIT), Russian (ruRU)
+
+&nbsp;
+
+## Settings
+
+Open with the gear icon in the title bar. All controls are custom-themed to match the interface (checkboxes, sliders, dropdown).
+
+- __Show counter__ with a reset button (on by default)
+- __Show only learned__ spells (off by default)
+- __Auto-close__ the window on cast (off by default)
+- __Announce portal__ in party/raid (off by default)
+- __Transparency__ slider for the whole interface
+- __Scale__ slider – resizes the main window and every popup (70–150 %)
+- __Language__ selector – force any bundled language in-game, no `/reload` needed. “Automatic” follows the game client
+- __Minimap icon__ toggle
+- __Changelog__ and __About__ buttons at the bottom open their own popups (the changelog never pops up on its own)
+
+&nbsp;
+
+
+
+## Client differences
 
 ### Retail
 - Expansion filter tabs (including “All”)
@@ -64,8 +80,20 @@ __Horde:__ Orgrimmar, Undercity, Thunder Bluff
 
 &nbsp;
 
+## Languages
+- English (enUS)
+- German (deDE)
+- French (frFR)
+- Spanish – Europe (esES)
+- Spanish – Latin America (esMX)
+- Italian (itIT) — no official WoW client; selectable via the in-game language dropdown
+- Russian (ruRU)
+
+&nbsp;
+
 ## Usage
 
-- Type `/portalb` or click the minimap button to toggle the window
-- Drag the window to reposition it (position is saved automatically)
+- Type `/portalb` or `/pb`, or click the minimap button, to toggle the window
+- Drag the window to reposition it, use the __Scale__ slider in Options to resize it (position and size are saved automatically)
+- Press `Esc` to close the window
 - Optional: create a macro with `/portalb` to open the UI from an action bar button
