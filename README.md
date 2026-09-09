@@ -23,12 +23,11 @@ Supports __Retail__ (Midnight), __Burning Crusade Classic__, and __Classic Era__
 - __Modern UI:__ Dark panel with teleports on the left, portals on the right, and destination names in the center – always faction-aware (Alliance/Horde)
 - __Smart spell detection:__ Learned spells are ready to cast. Unlearned spells show as desaturated/red with level requirement and where to learn them. Newly learned spells appear instantly, without reopening the window
 - __Clickable spell buttons:__ Cast teleports and portals directly from the interface
-- __Minimap button:__ Left-click to open/close, right-click + drag to move it around the ring; can be hidden in the settings
+- __Minimap button:__ Left-click to open/close, right-click + drag to move it around the ring, can be hidden in the settings
 - __Movable & resizable window:__ Drag to reposition, position, size and all settings are saved automatically. Press `Esc` to close
 - __Class check:__ Non-mages see a red “Not a Mage” warning in the title bar
 - __Cast counter:__ Counts every teleport and portal you cast – including casts straight from the spellbook, regardless of the active tab
 - __Party/raid announce:__ Optional “Open a Portal to X” message when you open a portal (portals only, never plain teleports), always posted in English so the whole group reads the same message
-- __Full localization:__ English (enUS), German (deDE), French (frFR), Spanish (esES / esMX), Italian (itIT), Russian (ruRU)
 
 &nbsp;
 
@@ -84,9 +83,9 @@ __Horde:__ Orgrimmar, Undercity, Thunder Bluff
 - English (enUS)
 - German (deDE)
 - French (frFR)
-- Spanish – Europe (esES)
-- Spanish – Latin America (esMX)
-- Italian (itIT) — no official WoW client; selectable via the in-game language dropdown
+- Spanish (esES)
+- Spanish (esMX)
+- Italian (itIT)
 - Russian (ruRU)
 
 &nbsp;
