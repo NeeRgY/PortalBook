@@ -1,7 +1,17 @@
+<div align="center">
+<img src="https://img.shields.io/github/v/release/NeeRgY/PortalBook?style=for-the-badge" />
+<img src="https://img.shields.io/github/last-commit/NeeRgY/PortalBook?style=for-the-badge" />
+<img src="https://img.shields.io/github/issues/NeeRgY/PortalBook?style=for-the-badge" />
+<img src="https://img.shields.io/github/stars/NeeRgY/PortalBook?style=for-the-badge" />
+<br><br>
 
-[![version](https://img.shields.io/github/v/release/NeeRgY/PortalBook)](https://github.com/NeeRgY/PortalBook/releases)
-[![last commit](https://img.shields.io/github/last-commit/NeeRgY/PortalBook)](https://github.com/NeeRgY/PortalBook)
-[![Curseforge](https://img.shields.io/curseforge/dt/1439483?label=CurseForge&color=F16436)](https://www.curseforge.com/wow/addons/portal-book)
+[![Curseforge](https://img.shields.io/curseforge/dt/1439483?label=CurseForge&color=F16436&style=for-the-badge)](https://www.curseforge.com/wow/addons/portal-book)
+[![Discord](https://img.shields.io/discord/1538823169446645762?style=for-the-badge&label=Discord&color=5865F2)](https://discord.gg/YjfyDKckCS)
+<br>
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/neergy)
+
+</div>
 
 &nbsp;
 
